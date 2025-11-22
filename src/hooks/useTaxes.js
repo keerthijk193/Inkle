@@ -9,6 +9,7 @@ export default function useTaxes() {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingTax, setEditingTax] = useState(null)
+  const [successMessage, setSuccessMessage] = useState('')
 
   useEffect(() => {
     let mounted = true
@@ -32,6 +33,19 @@ export default function useTaxes() {
     }
   }, [])
 
+  async function refetch() {
+    setLoading(true)
+    try {
+      const taxRes = await api.getTaxes()
+      setTaxes(taxRes || [])
+      setError(null)
+    } catch (err) {
+      setError(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   function openEdit(tax) {
     setEditingTax(tax)
     setIsModalOpen(true)
@@ -43,13 +57,21 @@ export default function useTaxes() {
   }
 
   async function saveEdit(id, updatedFields) {
-    // Merge with existing
+    // Merge with existing and handle notification
     const existing = taxes.find((t) => String(t.id) === String(id)) || {}
     const payload = { ...existing, ...updatedFields }
-    const updated = await api.updateTax(id, payload)
-    setTaxes((prev) => prev.map((t) => (String(t.id) === String(id) ? updated : t)))
-    closeEdit()
-    return updated
+    try {
+      const updated = await api.updateTax(id, payload)
+      setTaxes((prev) => prev.map((t) => (String(t.id) === String(id) ? updated : t)))
+      setSuccessMessage('Saved successfully')
+      // clear after 3s
+      setTimeout(() => setSuccessMessage(''), 3000)
+      closeEdit()
+      return updated
+    } catch (err) {
+      setError(err)
+      throw err
+    }
   }
 
   return {
@@ -57,10 +79,12 @@ export default function useTaxes() {
     countries,
     loading,
     error,
+    successMessage,
     isModalOpen,
     editingTax,
     openEdit,
     closeEdit,
     saveEdit,
+    refetch,
   }
 }

@@ -61,6 +61,27 @@ body {
   overflow: hidden;
 }
 
+.toast-success {
+  position: relative;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #bbf7d0;
+}
+
+.empty-state {
+  padding: 48px 16px;
+  text-align: center;
+  color: #475569;
+}
+
+@media (max-width: 640px) {
+  #root.app-root { padding: 12px }
+  .site-title { font-size: 1rem }
+  .card-wrap { border-radius: 10px }
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

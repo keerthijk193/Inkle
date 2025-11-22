@@ -4,13 +4,14 @@ import EditModal from './EditModal'
 import useTaxes from '../hooks/useTaxes'
 
 export default function TaxesTable() {
-  const { taxes, countries, loading, error, isModalOpen, editingTax, openEdit, closeEdit, saveEdit } = useTaxes()
+  const { taxes, countries, loading, error, isModalOpen, editingTax, openEdit, closeEdit, saveEdit, successMessage, refetch } = useTaxes()
 
   const columns = useMemo(
     () => [
       {
         header: 'Name',
         accessorKey: 'name',
+        id: 'name',
       },
       {
         header: 'Country',
@@ -19,6 +20,7 @@ export default function TaxesTable() {
       },
       {
         header: 'Rate',
+        id: 'rate',
         cell: (info) => {
           const row = info.row.original
           return row.rate ?? row.tax ?? row.taxPercentage ?? row.value ?? '—'
@@ -54,8 +56,24 @@ export default function TaxesTable() {
   return (
     <div className="p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Taxes</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Taxes</h1>
       </div>
+
+      {successMessage ? (
+        <div className="mb-4 p-3 rounded border border-green-200 bg-green-50 text-green-800">
+          {successMessage}
+        </div>
+      ) : null}
+
+      {(!loading && taxes.length === 0) ? (
+        <div className="p-8 text-center text-gray-600">
+          <div className="text-xl font-semibold mb-2">No taxes found</div>
+          <div className="mb-4">There are no tax entries to display. Try refreshing the list.</div>
+          <div>
+            <button onClick={refetch} className="px-4 py-2 rounded bg-blue-600 text-white">Refresh</button>
+          </div>
+        </div>
+      ) : null}
 
       <div className="overflow-x-auto bg-white rounded shadow">
         <table className="min-w-full divide-y">
@@ -63,7 +81,7 @@ export default function TaxesTable() {
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>
                 {hg.headers.map((header) => (
-                  <th key={header.id} className="text-left px-4 py-3 text-sm text-gray-600">
+                  <th key={header.id} className={`px-4 py-3 text-sm text-gray-600 ${header.id === 'rate' ? 'text-right' : 'text-left'}`}>
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </th>
                 ))}
@@ -74,7 +92,7 @@ export default function TaxesTable() {
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="hover:bg-gray-50">
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-4 py-3 text-sm text-gray-800">
+                  <td key={cell.id} className={`px-4 py-3 text-sm text-gray-800 ${cell.column.id === 'rate' ? 'text-right font-mono' : ''} ${cell.column.id === 'name' || cell.column.id === 'country' ? 'max-w-[220px] truncate' : ''}`}>
                     {flexRender(cell.column.columnDef.cell ?? cell.column.columnDef.accessorKey, cell.getContext())}
                   </td>
                 ))}
