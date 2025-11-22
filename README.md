@@ -2,7 +2,7 @@
 
 > Frontend intern assignment — a small React app that lists tax entries, lets you edit name and country, and updates the backend via API.
 
-Live demo: (deploy the app and paste the public URL here)
+Live demo: https://inkle-teal.vercel.app/
 
 Repository: https://github.com/keerthijk193/Inkle
 
